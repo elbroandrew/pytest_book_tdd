@@ -1,5 +1,6 @@
 import unittest
-from auth.auth import Authentication, Authorization
+
+from auth import Authentication, Authorization
 
 """
 So TestAuthentication.test_login will be a unit test that verifies the behavior of the
@@ -10,7 +11,6 @@ that verifies the behavior of the Authorization.can unit
 
 class TestAuthentication(unittest.TestCase):
     def test_login(self):
-
         auth = Authentication()
         auth.USERS = [{"username": "testuser",
                        "password": "testpass"}]
@@ -42,7 +42,6 @@ test as it doesn't depend on any other unit.
 
 class TestAuthorizeAuthenticatedUser(unittest.TestCase):
     def test_auth(self):
-
         auth = Authentication()
         authz = Authorization()
 
@@ -54,3 +53,7 @@ class TestAuthorizeAuthenticatedUser(unittest.TestCase):
         u = auth.login("testuser", "testpass")
         resp = authz.can(u, "create")
         assert resp is True
+
+
+if __name__ == '__main__':
+    unittest.main()
