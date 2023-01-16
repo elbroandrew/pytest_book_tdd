@@ -1,6 +1,6 @@
 import unittest
 
-from auth.auth import Authentication, Authorization
+from auth import Authentication, Authorization
 
 
 
