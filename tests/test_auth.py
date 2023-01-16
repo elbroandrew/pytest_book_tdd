@@ -1,6 +1,8 @@
 import unittest
 
-from auth import Authentication, Authorization
+from auth.auth import Authentication, Authorization
+
+
 
 """
 So TestAuthentication.test_login will be a unit test that verifies the behavior of the
