@@ -28,6 +28,11 @@ class ChatClient:
     def __init__(self, nickname):
         self.nickname = nickname
 
+    def send_message(self, message):
+        sent_message = "{}: {}".format(self.nickname, message)
+        self.connection.broadcast(message)
+        return sent_message
+
 
 if __name__ == '__main__':
     unittest.main()
