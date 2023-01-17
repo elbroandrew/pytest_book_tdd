@@ -18,6 +18,10 @@ class TestChatClient(unittest.TestCase):
         assert client.nickname == "User 1"
 
 
+class ChatClient:
+
+    def __init__(self, nickname):
+        self.nickname = nickname
 
 
 if __name__ == '__main__':
