@@ -17,6 +17,11 @@ class TestChatClient(unittest.TestCase):
         client = ChatClient("User 1")
         assert client.nickname == "User 1"
 
+    def test_send_message(self):
+        client = ChatClient("User 1")
+        sent_message = client.send_message("Hello World")
+        assert sent_message == "User 1: Hello World"
+
 
 class ChatClient:
 
