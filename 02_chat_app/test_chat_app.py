@@ -28,7 +28,14 @@ class TestChatClient(unittest.TestCase):
 
 class TestConnection(unittest.TestCase):
     def test_broadcast(self):
-        c = Connection(("localhost", 9090))
+        """
+        unittest.mock.patch.object is a convenience method that allows us to replace a
+        method or attribute of an object with a unittest.mock.Mock for the whole duration of the
+        code block within the context. So in this case, we disabled the Connection.connect
+        method so that the connection could be created without a server
+        """
+        with unittest.mock.patch.object(Connection, "connect"):
+            c = Connection(("localhost", 9090))
         c.broadcast("some message")
         assert c.get_messages()[-1] == "some message"
 
