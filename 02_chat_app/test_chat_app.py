@@ -1,4 +1,5 @@
 import unittest
+import unittest.mock
 
 
 class TestChatAcceptance(unittest.TestCase):
@@ -19,7 +20,7 @@ class TestChatClient(unittest.TestCase):
 
     def test_send_message(self):
         client = ChatClient("User 1")
-        client_connection = _DummyConnection()
+        client.connection = unittest.mock.Mock()
         sent_message = client.send_message("Hello World")
         assert sent_message == "User 1: Hello World"
 
@@ -34,10 +35,6 @@ class ChatClient:
         self.connection.broadcast(message)
         return sent_message
 
-
-class _DummyConnection:
-    def broadcast(*args, **kwargs):
-        pass
 
 
 if __name__ == '__main__':
