@@ -1,5 +1,6 @@
 import unittest
 import unittest.mock
+from multiprocessing.managers import SyncManager
 
 
 class TestChatAcceptance(unittest.TestCase):
@@ -25,6 +26,13 @@ class TestChatClient(unittest.TestCase):
         assert sent_message == "User 1: Hello World"
 
 
+class TestConnection(unittest.TestCase):
+    def test_broadcast(self):
+        c = Connection(("localhost", 9090))
+        c.broadcast("some message")
+        assert c.get_messages()[-1] == "some message"
+
+
 class ChatClient:
 
     def __init__(self, nickname):
@@ -34,6 +42,13 @@ class ChatClient:
         sent_message = "{}: {}".format(self.nickname, message)
         self.connection.broadcast(message)
         return sent_message
+
+
+class Connection(SyncManager):
+    def __init__(self, address):
+        self.register("get_messages")
+        super().__init__(address=address, authkey=b'mychatsecret')
+        self.connect()
 
 
 
