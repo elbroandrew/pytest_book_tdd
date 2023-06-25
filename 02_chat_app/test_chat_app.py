@@ -36,8 +36,10 @@ class TestConnection(unittest.TestCase):
         """
         with unittest.mock.patch.object(Connection, "connect"):
             c = Connection(("localhost", 9090))
-        c.broadcast("some message")
-        assert c.get_messages()[-1] == "some message"
+
+        with unittest.mock.patch.object(c, "get_messages", return_value=[]):
+            c.broadcast("some message")
+            assert c.get_messages()[-1] == "some message"
 
 
 class ChatClient:
