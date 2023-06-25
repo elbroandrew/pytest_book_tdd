@@ -1,3 +1,5 @@
+Book: `"Crafting test-driven software with python -- A.Molina"`
+
 - If folders' structure looks like this:
 
 `working_dir/auth.py`
