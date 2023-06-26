@@ -37,8 +37,7 @@ class TestChatClient(unittest.TestCase):
         connection_spy = unittest.mock.MagicMock()
         with unittest.mock.patch.object(client, "_get_connection", return_value=connection_spy):
             client.send_message("Hello World")
-        # assert that the spy was called with the expected data to broadcast
-        connection_spy.broadcast.assert_called_with(("User 1: Hello World"))
+        connection_spy.broadcast.assert_called_with("User 1: Hello World")
 
     def test_client_fetch_messages(self):
         client = ChatClient("User 1")
@@ -115,49 +114,6 @@ class FakeServer:
         pass
 
 
-class ChatClient:
-
-    def __init__(self, nickname):
-        self._last_msg_idx = 0
-        self.nickname = nickname
-        self._connection = None
-
-    def send_message(self, message):
-        sent_message = "{}: {}".format(self.nickname, message)
-        self.connection.broadcast(sent_message)
-        return sent_message
-
-    def fetch_messages(self):
-        messages = list(self.connection.get_messages())
-        new_messages = messages[self._last_msg_idx:]
-        self._last_msg_idx = len(messages)
-        return new_messages
-
-    @property
-    def connection(self):
-        if self._connection is None:
-            self._connection = self._get_connection()
-        return self._connection
-
-    @connection.setter
-    def connection(self, value):
-        if self._connection is not None:
-            self._connection.close()
-        self._connection = value
-
-    def _get_connection(self):
-        c = Connection(("localhost", 9090))
-        c.connect()
-        return c
-
-
-"""
-A possible idea for how to implement cross-client communication is to use a
-multiprocessing.managers.SyncManager and store the messages in a list that is
-accessible by all the clients that connect to it.
-"""
-
-
 class Connection(SyncManager):
     """
     The only thing we will have to do is register a single Connection.get_messages
@@ -179,6 +135,37 @@ class Connection(SyncManager):
     def broadcast(self, message):
         messages = self.get_messages()
         messages.append(message)
+
+
+class ChatClient:
+
+    def __init__(self, nickname, connection_provider=Connection):
+        self._last_msg_idx = 0
+        self.nickname = nickname
+        self._connection = None
+        self._connection_provider = connection_provider
+
+    def send_message(self, message):
+        sent_message = "{}: {}".format(self.nickname, message)
+        self.connection.broadcast(sent_message)
+        return sent_message
+
+    def fetch_messages(self):
+        messages = list(self.connection.get_messages())
+        new_messages = messages[self._last_msg_idx:]
+        self._last_msg_idx = len(messages)
+        return new_messages
+
+    @property
+    def connection(self):
+        if self._connection is None:
+            self._connection = self._connection_provider(("localhost", 9090))
+        return self._connection
+
+    def _get_connection(self):
+        c = Connection(("localhost", 9090))
+        c.connect()
+        return c
 
 
 _messages = []
