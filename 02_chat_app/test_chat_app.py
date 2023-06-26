@@ -83,10 +83,23 @@ class FakeServer:
         self.last_args = args
 
     def recv(self, *args, **kwargs):
-        if self.last_command == 'dummy':  # handle dummy command, because it is default multiprocessing managers command
+        if self.last_command == 'dummy':
+            return "#RETURN", None
+        # handle other commands
+        elif self.last_command == "create":
+            return "#RETURN", ("fakeid", tuple())
+        elif self.last_command == "append":
+            self.messages.append(self.last_args[0])
+            return "#RETURN", None
+        elif self.last_command == "__getitem__":
+            return "#RETURN", self.messages[self.last_args[0]]
+        elif self.last_command in ("incref", "decref", "accept_connection"):
             return "#RETURN", None
         else:
             return "#ERROR", ValueError("%s - %r" % (self.last_command, self.last_args))
+
+    def close(self):
+        pass
 
 
 class ChatClient:
