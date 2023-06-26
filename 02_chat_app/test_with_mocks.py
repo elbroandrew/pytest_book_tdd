@@ -16,7 +16,8 @@ class TestReadFile(unittest.TestCase):
 
     def test_read_file(self):
         m = Mock()
-        read_file(m)
+        m.read.return_value = "Hello World"
+        print(read_file(m))
 
 
 
