@@ -51,6 +51,29 @@ class TestConnection(unittest.TestCase):
             assert c.get_messages()[-1] == "some message"
 
 
+
+
+class FakeServer:
+    def __init__(self):
+        self.last_command = None
+        self.last_args = None
+        self.messages = []
+
+    def __call__(self, *args, **kwargs):
+        # make the SyncManager think that a new connection was created.
+        return self
+
+    def send(self, data):
+        # track any command that was sent to the server
+        callid, command, args, kwargs = data
+        self.last_command = command
+        self.last_args = args
+
+    def recv(self, *args, **kwargs):
+        # for now we don't support any command, so our fake server responds with error to any command.
+        return "#ERROR", ValueError("%s - %r" % (self.last_command, self.last_args))
+
+
 class ChatClient:
 
     def __init__(self, nickname):
