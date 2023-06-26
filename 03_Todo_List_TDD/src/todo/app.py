@@ -9,10 +9,16 @@ class TodoApp:
     def run(self):
         self._quit = False
         while not self._quit:
-            self._out(self.prompt(""))
+            self._out(self.prompt(self.prompt(self.items_list())))
             command = self._in()
             self._dispatch(command)
         self._out("bye!\n")
+
+    def items_list(self):
+        enumerated_items = enumerate(self._entries, start=1)
+        return "\n".join(
+            "{}. {}".format(idx, entry) for idx, entry in enumerated_items
+        )
 
     def prompt(self, output):
         return """TODOs:
