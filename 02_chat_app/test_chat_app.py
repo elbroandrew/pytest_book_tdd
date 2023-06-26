@@ -1,6 +1,6 @@
 import unittest
 import unittest.mock
-from multiprocessing.managers import SyncManager
+from multiprocessing.managers import SyncManager, ListProxy
 
 '''
 Класс Manager() модуля multiprocessing возвращает запущенный объект SyncManager, 
@@ -56,8 +56,8 @@ class TestConnection(unittest.TestCase):
 
     def test_exchange_with_server(self):
         with unittest.mock.patch(  # patch replaces standard impl of the server/client channel (pickle) with ours.
-            "multiprocessing.managers.listener_client",
-            new={"pickle": (None, FakeServer())}
+                "multiprocessing.managers.listener_client",
+                new={"pickle": (None, FakeServer())}
         ):
             c1 = Connection(("localhost", 9090))
             c2 = Connection(("localhost", 9090))
@@ -113,6 +113,9 @@ class ChatClient:
         self.connection.broadcast(sent_message)
         return sent_message
 
+    def fetch_messages(self):
+        return list(self.connection.get_messages())
+
     @property
     def connection(self):
         if self._connection is None:
@@ -126,7 +129,9 @@ class ChatClient:
         self._connection = value
 
     def _get_connection(self):
-        return Connection(("localhost", 9090))
+        c = Connection(("localhost", 9090))
+        c.connect()
+        return c
 
 
 """
@@ -145,7 +150,7 @@ class Connection(SyncManager):
     """
 
     def __init__(self, address):
-        self.register("get_messages")
+        self.register("get_messages", proxytype=ListProxy)
         super().__init__(address=address, authkey=b'mychatsecret')
         self.connect()
 
