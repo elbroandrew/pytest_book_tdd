@@ -7,15 +7,17 @@ from multiprocessing.managers import SyncManager, ListProxy
 который можно использовать для совместного использования объектов между процессами.
 '''
 
+
 class TestChatAcceptance(unittest.TestCase):
 
     def test_message_exchange(self):
-        user1 = ChatClient("John Doe")
-        user2 = ChatClient("Harry Potter")
+        with new_chat_server():
+            user1 = ChatClient("John Doe")
+            user2 = ChatClient("Harry Potter")
 
-        user1.send_message("Hello World")
-        messages = user2.fetch_messages()
-        assert messages == ["John Doe: Hello World"]
+            user1.send_message("Hello World")
+            messages = user2.fetch_messages()
+            assert messages == ["John Doe: Hello World"]
 
 
 class TestChatClient(unittest.TestCase):
@@ -37,6 +39,17 @@ class TestChatClient(unittest.TestCase):
             client.send_message("Hello World")
         # assert that the spy was called with the expected data to broadcast
         connection_spy.broadcast.assert_called_with(("User 1: Hello World"))
+
+    def test_client_fetch_messages(self):
+        client = ChatClient("User 1")
+        client.connection = unittest.mock.Mock()
+        client.connection.get_messages.return_value = ["message1", "message2"]
+        starting_messages = client.fetch_messages()
+        client.connection.get_messages().append("message3")
+        new_messages = client.fetch_messages()
+
+        assert starting_messages == ["message1", "message2"]
+        assert new_messages == ["message3"]
 
 
 class TestConnection(unittest.TestCase):
@@ -105,6 +118,7 @@ class FakeServer:
 class ChatClient:
 
     def __init__(self, nickname):
+        self._last_msg_idx = 0
         self.nickname = nickname
         self._connection = None
 
@@ -114,7 +128,10 @@ class ChatClient:
         return sent_message
 
     def fetch_messages(self):
-        return list(self.connection.get_messages())
+        messages = list(self.connection.get_messages())
+        new_messages = messages[self._last_msg_idx:]
+        self._last_msg_idx = len(messages)
+        return new_messages
 
     @property
     def connection(self):
@@ -162,6 +179,24 @@ class Connection(SyncManager):
     def broadcast(self, message):
         messages = self.get_messages()
         messages.append(message)
+
+
+_messages = []
+
+
+def _srv_get_messages():
+    return _messages
+
+
+class _ChatServerManager(SyncManager):
+    pass
+
+
+_ChatServerManager.register("get_messages", callable=_srv_get_messages, proxytype=ListProxy)
+
+
+def new_chat_server():
+    return _ChatServerManager(("", 9090), authkey=b'mychatsecret')
 
 
 if __name__ == '__main__':
