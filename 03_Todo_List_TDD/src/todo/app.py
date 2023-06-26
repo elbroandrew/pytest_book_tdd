@@ -4,6 +4,7 @@ class TodoApp:
     def __init__(self, io=(input, functools.partial(print, end=""))):  # use builtin input and print to input and output
         self._in, self._out = io
         self._quit = False
+        self._entries = []
 
     def run(self):
         self._quit = False
@@ -26,3 +27,6 @@ class TodoApp:
             self._out("Invalid command: {}\n".format(cmd))
             return
         executor(*args)
+
+    def cmd_add(self, what):
+        self._entries.append(what)
