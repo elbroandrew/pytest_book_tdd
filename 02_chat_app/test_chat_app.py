@@ -2,6 +2,10 @@ import unittest
 import unittest.mock
 from multiprocessing.managers import SyncManager
 
+'''
+Класс Manager() модуля multiprocessing возвращает запущенный объект SyncManager, 
+который можно использовать для совместного использования объектов между процессами.
+'''
 
 class TestChatAcceptance(unittest.TestCase):
 
@@ -79,8 +83,10 @@ class FakeServer:
         self.last_args = args
 
     def recv(self, *args, **kwargs):
-        # for now we don't support any command, so our fake server responds with error to any command.
-        return "#ERROR", ValueError("%s - %r" % (self.last_command, self.last_args))
+        if self.last_command == 'dummy':  # handle dummy command, because it is default multiprocessing managers command
+            return "#RETURN", None
+        else:
+            return "#ERROR", ValueError("%s - %r" % (self.last_command, self.last_args))
 
 
 class ChatClient:
