@@ -9,7 +9,7 @@ class TodoApp:
     def run(self):
         self._quit = False
         while not self._quit:
-            self._out(self.prompt(self.prompt(self.items_list())))
+            self._out(self.prompt(self.items_list()))
             command = self._in()
             self._dispatch(command)
         self._out("bye!\n")
@@ -36,3 +36,13 @@ class TodoApp:
 
     def cmd_add(self, what):
         self._entries.append(what)
+
+    def cmd_quit(self, *_):
+        self._quit = True
+
+    def cmd_del(self, idx):
+        idx = int(idx) - 1
+        if idx < 0 or idx >= len(self._entries):
+            self._out("Invalid index\n")
+            return
+        self._entries.pop(idx)
