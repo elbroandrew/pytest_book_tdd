@@ -10,6 +10,7 @@ class TodoApp:
         while not self._quit:
             self._out(self.prompt(""))
             command = self._in()
+            self._dispatch(command)
         self._out("bye!\n")
 
     def prompt(self, output):
@@ -18,3 +19,10 @@ class TodoApp:
 
 > """.format(output)
 
+    def _dispatch(self, cmd):
+        cmd, *args = cmd.split(" ", 1)
+        executor = getattr(self, "cmd_{}".format(cmd), None)
+        if executor is None:
+            self._out("Invalid command: {}\n".format(cmd))
+            return
+        executor(*args)
