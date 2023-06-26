@@ -1,8 +1,20 @@
 import unittest
 import threading  # to run app on the background during our test
+import queue
+
+from todo.app import TodoApp
 
 
 class TestTodoAcceptance(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.inputs = queue.Queue()
+        self.outputs = queue.Queue()
+        self.fake_output = lambda txt: self.outputs.put(txt)
+        self.fake_input = lambda: self.inputs.get()
+        self.get_output = lambda: self.outputs.get(timeout=1)
+        self.send_input = lambda cmd: self.inputs.put(cmd)
+
     def test_main(self):
         app = TodoApp(io=(self.fake_input, self.fake_output))
         app_thread = threading.Thread(target=app.run, daemon=True)
