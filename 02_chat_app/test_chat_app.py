@@ -50,7 +50,16 @@ class TestConnection(unittest.TestCase):
             c.broadcast("some message")
             assert c.get_messages()[-1] == "some message"
 
+    def test_exchange_with_server(self):
+        with unittest.mock.patch(  # patch replaces standard impl of the server/client channel (pickle) with ours.
+            "multiprocessing.managers.listener_client",
+            new={"pickle": (None, FakeServer())}
+        ):
+            c1 = Connection(("localhost", 9090))
+            c2 = Connection(("localhost", 9090))
 
+            c1.broadcast("connected message")
+            assert c2.get_messages()[-1] == "connected message"
 
 
 class FakeServer:
