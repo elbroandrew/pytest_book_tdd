@@ -18,6 +18,7 @@ class TestReadFile(unittest.TestCase):
         m = Mock()
         print(read_file(m))
         print(m.read.call_count)  # 1
+        m.read.assert_called_with()  # f.read was called with no args.
 
 
 
