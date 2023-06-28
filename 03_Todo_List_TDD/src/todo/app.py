@@ -1,10 +1,13 @@
 import functools
 
+
 class TodoApp:
-    def __init__(self, io=(input, functools.partial(print, end=""))):  # use builtin input and print to input and output
+    def __init__(self, io=(input, functools.partial(print, end="")), # use builtin input and print to input and output
+                 dbpath=None):
         self._in, self._out = io
         self._quit = False
         self._entries = []
+        self._dbpath = dbpath or "."
 
     def run(self):
         self._quit = False
