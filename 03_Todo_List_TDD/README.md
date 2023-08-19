@@ -1,6 +1,18 @@
 To run this simple console app just enter:
 
-`python -m todo`
+если ошибка NoModuleNamed todo:
+
+иду в `src`, где лежит `setup.py`, запускаю команду `pip install .`
+
+затем только иду назад в папку `03_Todo_List_TDD`
+
+и запускаю тесты:
+
+`python -m unittest discover -k unit`
+
+---
+
+`python -m todo` -> запускает приложение (т.к. есть `__main__` в `src`)
 
 Короче, я так понимаю суть такова с тредами: запускаю приложение 
 и отдельно тесты в другом треде. Т.е. тесты в работе, а приложение можем запустить/остановить
