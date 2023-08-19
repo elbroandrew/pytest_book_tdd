@@ -4,6 +4,8 @@ To run this simple console app just enter:
 
 иду в `src`, где лежит `setup.py`, запускаю команду `pip install .`
 
+или `pip install -e .` (сбилдит проект, и смогу использовать изменеия без переустановки todo приложения типа того)
+
 затем только иду назад в папку `03_Todo_List_TDD`
 
 и запускаю тесты:
